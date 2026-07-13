@@ -1,0 +1,66 @@
+{% extends 'store/base.html' %}
+{% block title %}Products — Zesto{% endblock %}
+{% block content %}
+
+<div class="page-hd">
+  <div class="container">
+    <h1>{% if query %}Results for "{{ query }}"{% elif selected_category %}{{ selected_category|title }}{% else %}All Products{% endif %}</h1>
+  </div>
+</div>
+
+<div class="container" style="padding-bottom:60px;">
+  <!-- Category pills -->
+  <div class="cat-scroll">
+    <a href="{% url 'product_list' %}{% if query %}?q={{ query }}{% endif %}" class="cat-pill {% if not selected_category %}active{% endif %}">All</a>
+    {% for cat in categories %}
+    <a href="{% url 'product_list' %}?category={{ cat.slug }}{% if query %}&q={{ query }}{% endif %}"
+       class="cat-pill {% if selected_category == cat.slug %}active{% endif %}">{{ cat.name }}</a>
+    {% endfor %}
+  </div>
+
+  <!-- Grid -->
+  <div class="product-grid">
+    {% for product in products %}
+    <div class="pcard">
+      <div class="pcard-img">
+        <a href="{% url 'product_detail' product.slug %}">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+          {% else %}
+            {% with s=product.category.slug %}
+            {% if "electron" in s %}<img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=500&q=80" alt="">
+            {% elif "cloth" in s %}<img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=500&q=80" alt="">
+            {% elif "book" in s %}<img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=500&q=80" alt="">
+            {% elif "home" in s %}<img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&q=80" alt="">
+            {% else %}<img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" alt="">
+            {% endif %}
+            {% endwith %}
+          {% endif %}
+        </a>
+        <button class="pcard-wish">♡</button>
+      </div>
+      <div class="pcard-body">
+        <div class="pcard-cat">{{ product.category.name }}</div>
+        <div class="pcard-name"><a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a></div>
+        <div class="pcard-stars">★★★★{% if forloop.counter|divisibleby:5 %}☆{% else %}★{% endif %} <span class="pcard-rcount">({{ forloop.counter|add:8 }})</span></div>
+        <div style="font-size:.76rem;color:var(--muted);margin-bottom:10px;">{{ product.stock }} in stock</div>
+        <div class="pcard-foot">
+          <div class="pcard-price">₹{{ product.price }}</div>
+          <form method="post" action="{% url 'add_to_cart' product.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="quantity" value="1">
+            <button type="submit" class="pcard-add">+ Cart</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div style="grid-column:1/-1;text-align:center;padding:80px;color:var(--muted);">
+      <div style="font-size:3rem;margin-bottom:14px;">🔍</div>
+      <h3 style="margin-bottom:8px;font-weight:700;">No products found</h3>
+      <p>Try a different category or search term.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

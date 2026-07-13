@@ -1,0 +1,25 @@
+{% extends 'store/base.html' %}
+{% block title %}Order Confirmed — Zesto{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="succ-wrap">
+    <div class="succ-icon">🎉</div>
+    <h1>Order Confirmed!</h1>
+    <p>Thank you, <strong>{{ order.full_name }}</strong>! Your order <strong>#{{ order.id }}</strong> has been received and is being processed.</p>
+
+    <div class="order-meta">
+      <div class="om-row"><span>Order ID</span><span>#{{ order.id }}</span></div>
+      <div class="om-row"><span>Amount</span><span style="color:var(--teal);">₹{{ order.total_price }}</span></div>
+      <div class="om-row"><span>Status</span><span class="sbadge sb-{{ order.status }}">{{ order.get_status_display }}</span></div>
+      <div class="om-row"><span>Phone</span><span>{{ order.phone }}</span></div>
+      <div class="om-row"><span>Address</span><span>{{ order.address }}, {{ order.city }}, {{ order.state }} — {{ order.pincode }}</span></div>
+      <div class="om-row"><span>Payment</span><span>Cash on Delivery</span></div>
+    </div>
+
+    <div class="succ-btns">
+      <a href="{% url 'my_orders' %}" class="btn btn-primary btn-lg">📋 My Orders</a>
+      <a href="{% url 'product_list' %}" class="btn btn-ghost btn-lg">🛍️ Continue Shopping</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

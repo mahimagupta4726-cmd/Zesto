@@ -1,0 +1,135 @@
+{% extends 'store/base.html' %}
+{% block title %}Zesto — Premium Shopping{% endblock %}
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="container">
+    <div class="hero-content">
+      <span class="hero-tag">✨ New Arrivals 2024</span>
+      <h1>Shop the <em>Best</em><br>Deals Online</h1>
+      <p>Thousands of curated products — electronics, fashion, books &amp; more — delivered right to your door.</p>
+      <div class="hero-btns">
+        <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg">Shop Now →</a>
+        {% if not user.is_authenticated %}
+          <a href="{% url 'register' %}" class="btn btn-lg" style="background:rgba(255,255,255,.1);color:#fff;border:1.5px solid rgba(255,255,255,.3);">Create Account</a>
+        {% endif %}
+      </div>
+      <div class="hero-stats">
+        <div><div class="hero-stat-num">10,000+</div><div class="hero-stat-lbl">Products</div></div>
+        <div><div class="hero-stat-num">50,000+</div><div class="hero-stat-lbl">Happy Customers</div></div>
+        <div><div class="hero-stat-num">4.9 ★</div><div class="hero-stat-lbl">Avg Rating</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section" style="padding-bottom:0;">
+  <div class="container">
+    <div class="sec-hd">
+      <h2>Browse Categories</h2>
+      <p>Find exactly what you need</p>
+    </div>
+    <div class="cat-scroll">
+      <a href="{% url 'product_list' %}" class="cat-pill active">🏠 All Products</a>
+      {% for cat in categories %}
+      <a href="{% url 'product_list' %}?category={{ cat.slug }}" class="cat-pill">
+        {% if "electron" in cat.slug %}📱
+        {% elif "cloth" in cat.slug %}👗
+        {% elif "book" in cat.slug %}📚
+        {% elif "home" in cat.slug %}🏡
+        {% elif "sport" in cat.slug %}⚽
+        {% elif "beauty" in cat.slug %}💄
+        {% else %}🏷️{% endif %}
+        {{ cat.name }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="section">
+  <div class="container">
+    <div class="sec-hd sec-hd-row">
+      <div>
+        <h2>Featured Products</h2>
+        <p>Hand-picked deals just for you</p>
+      </div>
+      <a href="{% url 'product_list' %}" class="btn btn-ghost">View All →</a>
+    </div>
+    <div class="product-grid">
+      {% for product in featured %}
+      <div class="pcard">
+        <div class="pcard-img">
+          <a href="{% url 'product_detail' product.slug %}">
+            {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+              {% with s=product.category.slug %}
+              {% if "electron" in s %}<img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=500&q=80" alt="">
+              {% elif "cloth" in s %}<img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=500&q=80" alt="">
+              {% elif "book" in s %}<img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=500&q=80" alt="">
+              {% elif "home" in s %}<img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&q=80" alt="">
+              {% else %}<img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" alt="">
+              {% endif %}
+              {% endwith %}
+            {% endif %}
+          </a>
+          <button class="pcard-wish">♡</button>
+          {% if forloop.counter|divisibleby:3 %}<span class="pcard-badge">Sale</span>{% endif %}
+        </div>
+        <div class="pcard-body">
+          <div class="pcard-cat">{{ product.category.name }}</div>
+          <div class="pcard-name"><a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a></div>
+          <div class="pcard-stars">★★★★{% if forloop.counter|divisibleby:4 %}☆{% else %}★{% endif %} <span class="pcard-rcount">({{ forloop.counter|add:14 }})</span></div>
+          <div class="pcard-foot">
+            <div class="pcard-price">₹{{ product.price }}</div>
+            <form method="post" action="{% url 'add_to_cart' product.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="quantity" value="1">
+              <button type="submit" class="pcard-add">+ Cart</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted);">
+        <div style="font-size:3rem;margin-bottom:12px;">📦</div>
+        <p>No products yet. Add some from the <a href="/admin/" style="color:var(--teal);">admin panel</a>.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- PROMO BANNERS -->
+<section style="padding:0 0 64px;">
+  <div class="container">
+    <div class="promo-grid">
+      <div class="promo-card">
+        <img src="https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=700&q=70" alt="">
+        <div class="promo-overlay" style="background:linear-gradient(135deg,rgba(10,10,30,.85),rgba(0,105,92,.5));"></div>
+        <div class="promo-body">
+          <h3>Tech Deals</h3>
+          <p>Up to 40% off on the latest electronics</p>
+          <a href="{% url 'product_list' %}?category=electronics" class="btn btn-primary">Shop Electronics</a>
+        </div>
+      </div>
+      <div class="promo-card">
+        <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=700&q=70" alt="">
+        <div class="promo-overlay" style="background:linear-gradient(135deg,rgba(30,10,80,.85),rgba(80,40,140,.5));"></div>
+        <div class="promo-body">
+          <h3>Fashion Week</h3>
+          <p>Trending styles at unbeatable prices</p>
+          <a href="{% url 'product_list' %}?category=clothing" class="btn btn-primary">Shop Fashion</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

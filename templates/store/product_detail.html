@@ -1,0 +1,115 @@
+{% extends 'store/base.html' %}
+{% block title %}{{ product.name }} — Zesto{% endblock %}
+{% block content %}
+<div class="container">
+  <nav class="bc">
+    <a href="{% url 'home' %}">Home</a><span class="bc-sep">›</span>
+    <a href="{% url 'product_list' %}">Products</a><span class="bc-sep">›</span>
+    <a href="{% url 'product_list' %}?category={{ product.category.slug %}">{{ product.category.name }}</a><span class="bc-sep">›</span>
+    <span>{{ product.name }}</span>
+  </nav>
+
+  <div class="detail-grid">
+    <!-- Image -->
+    <div class="detail-gallery">
+      <div class="detail-main">
+        {% if product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}">
+        {% else %}
+          {% with s=product.category.slug %}
+          {% if "electron" in s %}<img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=800&q=85" alt="">
+          {% elif "cloth" in s %}<img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=800&q=85" alt="">
+          {% elif "book" in s %}<img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&q=85" alt="">
+          {% elif "home" in s %}<img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=85" alt="">
+          {% else %}<img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=85" alt="">
+          {% endif %}
+          {% endwith %}
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div>
+      <div class="detail-tag">{{ product.category.name }}</div>
+      <h1 class="detail-title">{{ product.name }}</h1>
+      <div class="detail-rating">
+        <span style="color:#F59E0B;letter-spacing:2px;font-size:1rem;">★★★★★</span>
+        <span style="font-size:.84rem;color:var(--muted);">4.8 &nbsp;(42 reviews)</span>
+      </div>
+      <div class="detail-price-row">
+        <span class="detail-price">₹{{ product.price }}</span>
+        <span class="d-save">Save 15%</span>
+      </div>
+
+      {% if product.is_in_stock %}
+        <span class="stock-pill stock-in"><span class="s-dot"></span> In Stock — {{ product.stock }} left</span>
+      {% else %}
+        <span class="stock-pill stock-out"><span class="s-dot"></span> Out of Stock</span>
+      {% endif %}
+
+      <p class="detail-desc">{{ product.description }}</p>
+
+      {% if product.is_in_stock %}
+      <form method="post" action="{% url 'add_to_cart' product.id %}">
+        {% csrf_token %}
+        <div class="qty-row">
+          <span class="qty-lbl">Quantity:</span>
+          <div class="qty-ctrl">
+            <button type="button" class="qty-btn" onclick="adj(-1)">−</button>
+            <input class="qty-val" type="number" id="qty" name="quantity" value="1" min="1" max="{{ product.stock }}">
+            <button type="button" class="qty-btn" onclick="adj(1)">+</button>
+          </div>
+        </div>
+        <div class="detail-actions">
+          <button type="submit" class="btn btn-primary btn-lg" style="flex:1;">🛒 Add to Cart</button>
+          <a href="{% url 'cart_detail' %}" class="btn btn-ghost btn-lg">View Cart</a>
+        </div>
+      </form>
+      {% else %}
+      <button class="btn btn-ghost btn-lg btn-full" disabled style="opacity:.5;cursor:not-allowed;">Out of Stock</button>
+      {% endif %}
+
+      <div class="detail-meta">
+        <div class="meta-row"><span class="meta-lbl">Category</span><span class="meta-val">{{ product.category.name }}</span></div>
+        <div class="meta-row"><span class="meta-lbl">Stock</span><span class="meta-val">{{ product.stock }} units</span></div>
+        <div class="meta-row"><span class="meta-lbl">Shipping</span><span class="meta-val">Free over ₹999</span></div>
+        <div class="meta-row"><span class="meta-lbl">Returns</span><span class="meta-val">30-day free returns</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related -->
+  {% if related %}
+  <div class="section" style="padding-top:0;">
+    <div class="sec-hd"><h2>You Might Also Like</h2></div>
+    <div class="product-grid">
+      {% for rp in related %}
+      <div class="pcard">
+        <div class="pcard-img">
+          <a href="{% url 'product_detail' rp.slug %}">
+            {% with s=rp.category.slug %}
+            {% if "electron" in s %}<img src="https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=400&q=75" alt="">
+            {% elif "cloth" in s %}<img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=400&q=75" alt="">
+            {% elif "book" in s %}<img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&q=75" alt="">
+            {% else %}<img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=75" alt="">
+            {% endif %}
+            {% endwith %}
+          </a>
+        </div>
+        <div class="pcard-body">
+          <div class="pcard-name"><a href="{% url 'product_detail' rp.slug %}">{{ rp.name }}</a></div>
+          <div class="pcard-foot">
+            <div class="pcard-price">₹{{ rp.price }}</div>
+            <a href="{% url 'product_detail' rp.slug %}" class="pcard-add">View</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+<script>
+function adj(d){const i=document.getElementById('qty');i.value=Math.max(1,Math.min(parseInt(i.max)||99,parseInt(i.value||1)+d));}
+</script>
+{% endblock %}

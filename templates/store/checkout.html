@@ -1,0 +1,86 @@
+{% extends 'store/base.html' %}
+{% block title %}Checkout — Zesto{% endblock %}
+{% block content %}
+<div class="page-hd"><div class="container"><h1>Checkout</h1></div></div>
+
+<div class="container">
+  <form method="post">
+    {% csrf_token %}
+    <div class="checkout-layout">
+
+      <!-- LEFT: Form -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="form-card">
+          <div class="form-card-title">📦 Shipping Details</div>
+          <div class="field-row">
+            <div class="field"><label>Full Name *</label><input type="text" name="full_name" value="{{ user.get_full_name }}" required placeholder="Mahima Gupta"></div>
+            <div class="field"><label>Email *</label><input type="email" name="email" value="{{ user.email }}" required placeholder="you@email.com"></div>
+          </div>
+          <div class="field"><label>Phone *</label><input type="tel" name="phone" required placeholder="+91 98765 43210"></div>
+          <div class="field"><label>Address *</label><textarea name="address" rows="2" required placeholder="House No., Street, Area"></textarea></div>
+          <div class="field-row">
+            <div class="field"><label>City *</label><input type="text" name="city" required placeholder="City"></div>
+            <div class="field"><label>State *</label><input type="text" name="state" required placeholder="State"></div>
+          </div>
+          <div class="field"><label>PIN Code *</label><input type="text" name="pincode" required placeholder="226001" maxlength="6"></div>
+        </div>
+
+        <div class="form-card">
+          <div class="form-card-title">💳 Payment Method</div>
+          <label class="pay-opt">
+            <input type="radio" name="payment" value="cod" checked>
+            <div>
+              <h4>💵 Cash on Delivery</h4>
+              <p>Pay when your order arrives at your doorstep.</p>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- RIGHT: Summary -->
+      <div class="osp">
+        <div class="osp-hd">🧾 Order Summary</div>
+        <div class="osp-body">
+          {% for item in cart_items %}
+          <div class="osp-item">
+            <div class="osp-img">
+              {% if item.product.image %}
+                <img src="{{ item.product.image.url }}" alt="">
+              {% else %}
+                {% with s=item.product.category.slug %}
+                {% if "electron" in s %}<img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=100&q=70" alt="">
+                {% elif "cloth" in s %}<img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=100&q=70" alt="">
+                {% elif "book" in s %}<img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=100&q=70" alt="">
+                {% else %}<img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=100&q=70" alt="">
+                {% endif %}
+                {% endwith %}
+              {% endif %}
+            </div>
+            <div style="flex:1;">
+              <div class="osp-name">{{ item.product.name }}</div>
+              <div class="osp-qty">Qty: {{ item.quantity }}</div>
+            </div>
+            <div class="osp-price">₹{{ item.subtotal }}</div>
+          </div>
+          {% endfor %}
+
+          <div class="osp-total">
+            <span>Total</span>
+            <span style="color:var(--teal);">₹{{ total }}</span>
+          </div>
+
+          <div style="background:var(--teal-lt);color:var(--teal-dk);font-size:.8rem;font-weight:600;padding:9px 12px;border-radius:8px;margin:14px 0;">
+            🚚 Free delivery on this order!
+          </div>
+
+          <button type="submit" class="btn btn-success btn-full btn-lg">
+            ✅ Place Order — ₹{{ total }}
+          </button>
+          <a href="{% url 'cart_detail' %}" class="btn btn-ghost btn-full" style="margin-top:10px;">← Back to Cart</a>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+{% endblock %}

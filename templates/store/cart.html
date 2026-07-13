@@ -1,0 +1,79 @@
+{% extends 'store/base.html' %}
+{% block title %}Cart — Zesto{% endblock %}
+{% block content %}
+<div class="page-hd"><div class="container"><h1>Shopping Cart</h1></div></div>
+
+<div class="container">
+  {% if cart_items %}
+  <div class="cart-layout">
+    <!-- Items -->
+    <div class="c-panel">
+      <div class="c-panel-hd">{{ cart_items|length }} item{% if cart_items|length != 1 %}s{% endif %}</div>
+      {% for item in cart_items %}
+      <div class="cart-item">
+        <div class="ci-img">
+          {% if item.product.image %}
+            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+          {% else %}
+            {% with s=item.product.category.slug %}
+            {% if "electron" in s %}<img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=200&q=75" alt="">
+            {% elif "cloth" in s %}<img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=200&q=75" alt="">
+            {% elif "book" in s %}<img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=200&q=75" alt="">
+            {% else %}<img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=200&q=75" alt="">
+            {% endif %}
+            {% endwith %}
+          {% endif %}
+        </div>
+        <div class="ci-info">
+          <div class="ci-name">{{ item.product.name }}</div>
+          <div class="ci-cat">{{ item.product.category.name }}</div>
+          <div class="ci-unit">₹{{ item.product.price }} each</div>
+        </div>
+        <div class="ci-right">
+          <div class="ci-total">₹{{ item.subtotal }}</div>
+          <form class="ci-qty-form" method="post" action="{% url 'update_cart' item.product.id %}">
+            {% csrf_token %}
+            <input class="ci-qty-inp" type="number" name="quantity" value="{{ item.quantity }}" min="0" max="{{ item.product.stock }}">
+            <button type="submit" class="btn btn-ghost btn-sm">Update</button>
+          </form>
+          <a href="{% url 'remove_from_cart' item.product.id %}" class="btn btn-danger btn-sm">Remove</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-panel">
+      <div class="sum-title">Order Summary</div>
+      {% for item in cart_items %}
+      <div class="sum-row">
+        <span>{{ item.product.name }} × {{ item.quantity }}</span>
+        <span>₹{{ item.subtotal }}</span>
+      </div>
+      {% endfor %}
+      <div class="sum-row">
+        <span>Shipping</span><span style="color:var(--green);font-weight:700;">FREE</span>
+      </div>
+      <div class="sum-total">
+        <span>Total</span><span style="color:var(--teal);">₹{{ total }}</span>
+      </div>
+      <div class="free-tag">🚚 Free delivery included!</div>
+      {% if user.is_authenticated %}
+        <a href="{% url 'checkout' %}" class="btn btn-primary btn-full btn-lg">Checkout →</a>
+      {% else %}
+        <a href="{% url 'login' %}?next={% url 'checkout' %}" class="btn btn-primary btn-full btn-lg">Sign in to Checkout →</a>
+      {% endif %}
+      <a href="{% url 'product_list' %}" class="btn btn-ghost btn-full" style="margin-top:10px;">← Continue Shopping</a>
+    </div>
+  </div>
+
+  {% else %}
+  <div class="empty-state" style="padding-bottom:60px;">
+    <div class="empty-icon">🛒</div>
+    <h2>Your cart is empty</h2>
+    <p>Add some products and they'll show up here.</p>
+    <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg">Browse Products</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Zesto — Premium Shopping{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="{% url 'home' %}" class="nav-logo">Zes<span>to</span></a>
+
+    <form class="nav-search" method="get" action="{% url 'product_list' %}">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" name="q" placeholder="Search products…" value="{{ request.GET.q }}">
+    </form>
+
+    <div class="nav-actions">
+      {% if user.is_authenticated %}
+        <a href="{% url 'my_orders' %}" class="nav-link">My Orders</a>
+        <a href="{% url 'logout' %}" class="nav-link">Sign out</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="nav-link">Sign in</a>
+        <a href="{% url 'register' %}" class="nav-link" style="color:var(--teal);font-weight:700;">Register</a>
+      {% endif %}
+      <a href="{% url 'cart_detail' %}" class="nav-cart">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        Cart <span class="badge">{{ cart_count }}</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- FLASH MESSAGES -->
+{% if messages %}
+<div class="container" style="padding-top:14px;">
+  <ul class="flash-list">
+    {% for msg in messages %}
+      <li class="flash {{ msg.tags }}">{{ msg }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% block content %}{% endblock %}
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="container">
+    <div class="trust-inner">
+      <div class="trust-item"><span class="t-icon">🚚</span><div><strong>Free Shipping</strong>On orders over ₹999</div></div>
+      <div class="trust-item"><span class="t-icon">🔒</span><div><strong>Secure Payments</strong>100% protected</div></div>
+      <div class="trust-item"><span class="t-icon">↩️</span><div><strong>Easy Returns</strong>30-day policy</div></div>
+      <div class="trust-item"><span class="t-icon">🎧</span><div><strong>24/7 Support</strong>Always here for you</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 <strong>Zesto</strong> </p>
+</footer>
+
+<script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

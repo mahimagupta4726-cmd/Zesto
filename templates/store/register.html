@@ -1,0 +1,26 @@
+{% extends 'store/base.html' %}
+{% block title %}Register — Zesto{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-brand">Zesto</div>
+    <h1 class="auth-title">Create Account</h1>
+    <p class="auth-sub">Join Zesto and start shopping today!</p>
+
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="field">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="fhint">{{ field.help_text }}</div>{% endif %}
+        {% for err in field.errors %}<div class="ferr">⚠ {{ err }}</div>{% endfor %}
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:8px;">Create Account →</button>
+    </form>
+
+    <p class="auth-switch">Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+  </div>
+</div>
+{% endblock %}
